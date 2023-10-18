@@ -52,6 +52,10 @@ def resolve_input_errors(name, amount):
 
 #Создание новой модели
 class CreateExpenseMutation(graphene.Mutation):
+    """
+    Создать новый расход
+    """
+
     expense = graphene.Field(ExpenseType)
 
     class Arguments:
@@ -84,6 +88,10 @@ class CreateExpenseMutation(graphene.Mutation):
         return CreateExpenseMutation(expense = inst_expense)
 
 class UpdateExpenseMutation(graphene.Mutation):
+    """
+    Обновить данные расхода по индексу
+    """
+
     expense = graphene.Field(ExpenseType)
 
     class Arguments:
@@ -192,6 +200,9 @@ class UpdateExpenseMutation(graphene.Mutation):
         return UpdateExpenseMutation(expense = inst_expense)
 
 class DeleteExpenseMutation(graphene.Mutation):
+    """
+    Удалить расход по индексу
+    """
     all_expenses = graphene.List(ExpenseType)
 
     class Arguments:

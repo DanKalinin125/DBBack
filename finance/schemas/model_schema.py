@@ -8,16 +8,18 @@ from ..utils import update_profit_dates, update_expense_dates, update_model_date
 
 #Модели
 class ModelType(DjangoObjectType):
+    """
+    Структура модели
+    """
     class Meta:
         model = Model
         fields = [f.name for f in Model._meta.fields]
 
-class DateType(DjangoObjectType):
-    class Meta:
-        model = Date
-        fields = [f.name for f in Date._meta.fields]
-
 def resolve_create_input_errors(name, start_date, finish_date, start_amount):
+    """
+    Валидация входных значений при создании модели
+    """
+
     if (len(name) > Model._meta.get_field('name').max_length):
         raise Exception("Name must be lower then " + str(Model._meta.get_field('name').max_length))
 
@@ -28,6 +30,10 @@ def resolve_create_input_errors(name, start_date, finish_date, start_amount):
         raise Exception("start_amount must be above zero")
 
 def resolve_update_input_errors(model, name, start_date, finish_date, start_amount):
+    """
+    Валидация входных значений при обновлении модели
+    """
+
     if not (name == None) and (len(name) > Model._meta.get_field('name').max_length):
         raise Exception("Name must be lower then " + str(Model._meta.get_field('name').max_length))
 
@@ -43,8 +49,11 @@ def resolve_update_input_errors(model, name, start_date, finish_date, start_amou
     if (start_amount != None) and (start_amount < 0):
         raise Exception("start_amount must be above zero")
 
-#Создание новой модели
+
 class CreateModelMutation(graphene.Mutation):
+    """
+    Создать новую модель
+    """
     model = graphene.Field(ModelType)
 
     class Arguments:
@@ -70,8 +79,11 @@ class CreateModelMutation(graphene.Mutation):
 
         return CreateModelMutation(model = inst_model)
 
-#Обновление модели
+
 class UpdateModelMutation(graphene.Mutation):
+    """
+    Обновить данные модели по индексу
+    """
     model = graphene.Field(ModelType)
 
     class Arguments:
@@ -132,6 +144,9 @@ class UpdateModelMutation(graphene.Mutation):
 
 #Обновление модели
 class DeleteModelMutation(graphene.Mutation):
+    """
+    Удалить модель по индексу
+    """
     all_models = graphene.List(ModelType)
 
     class Arguments:
@@ -149,25 +164,18 @@ class DeleteModelMutation(graphene.Mutation):
 
 
 class ModelQuery(graphene.ObjectType):
-    all_models = graphene.List(ModelType) #Все модели пользователя
-    model_dates = graphene.List(DateType, model_id=graphene.ID(required=True)) #Все даты модели
+    all_models = graphene.List(ModelType)
     model = graphene.Field(ModelType, model_id=graphene.ID(required=True)) #Модель пользователя по идентификатору
 
     def resolve_all_models(self, info):
-        if not(info.context.user.is_authenticated) : raise Exception("UserNotAuthenticated")
-        return Model.objects.filter(user = info.context.user)
+        if not (info.context.user.is_authenticated): raise Exception("UserNotAuthenticated")
+        return Model.objects.filter(user=info.context.user)
 
     def resolve_model(self, info, model_id):
         if not (info.context.user.is_authenticated) : raise Exception("UserNotAuthenticated")
         if not (Model.objects.get(id=model_id)): raise Exception("ModelNotFound")
         if not (info.context.user == Model.objects.get(id=model_id).user): raise Exception("UserDoesNotHaveThisModel")
         return Model.objects.get(id=model_id)
-
-    def resolve_model_dates(self, info, model_id):
-        if not (info.context.user.is_authenticated) : raise Exception("UserNotAuthenticated")
-        if not (Model.objects.get(id=model_id)): raise Exception("ModelNotFound")
-        if not (info.context.user == Model.objects.get(id=model_id).user): raise Exception("UserDoesNotHaveThisModel")
-        return Date.objects.filter(model = Model.objects.get(id=model_id))
 
 class ModelMutation(CreateModelMutation, UpdateModelMutation, DeleteModelMutation, graphene.ObjectType):
     create_model = CreateModelMutation.Field()

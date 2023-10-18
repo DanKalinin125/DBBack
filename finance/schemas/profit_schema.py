@@ -52,6 +52,10 @@ def resolve_input_errors(name, amount):
 
 #Создание новой модели
 class CreateProfitMutation(graphene.Mutation):
+    """
+    Создать новый доход
+    """
+
     profit = graphene.Field(ProfitType)
 
     class Arguments:
@@ -84,6 +88,9 @@ class CreateProfitMutation(graphene.Mutation):
         return CreateProfitMutation(profit = inst_profit)
 
 class UpdateProfitMutation(graphene.Mutation):
+    """
+    Обновить данные дохода по индексу
+    """
     profit = graphene.Field(ProfitType)
 
     class Arguments:
@@ -192,6 +199,10 @@ class UpdateProfitMutation(graphene.Mutation):
         return UpdateProfitMutation(profit=inst_profit)
 
 class DeleteProfitMutation(graphene.Mutation):
+    """
+    Удалить доход по индексу
+    """
+
     all_profits = graphene.List(ProfitType)
 
     class Arguments:
