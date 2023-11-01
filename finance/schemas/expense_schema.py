@@ -213,9 +213,10 @@ class DeleteExpenseMutation(graphene.Mutation):
         if not (info.context.user.is_authenticated): raise Exception("UserNotAuthenticated")
         if not (Expense.objects.get(id=expense_id)): raise Exception("ExpenseNotFound")
         if not (info.context.user == Expense.objects.get(id=expense_id).model.user): raise Exception("UserDoesNotHaveThisExpense")
-        model = Expense.objects.get(id=expense_id)
+        model = Expense.objects.get(id=expense_id).model
 
         Expense.objects.get(id=expense_id).delete()
+        update_model_dates(model)
 
         return DeleteExpenseMutation(Expense.objects.filter(model=model))
 

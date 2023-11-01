@@ -213,9 +213,10 @@ class DeleteProfitMutation(graphene.Mutation):
         if not (info.context.user.is_authenticated): raise Exception("UserNotAuthenticated")
         if not (Profit.objects.get(id=profit_id)): raise Exception("ProfitNotFound")
         if not (info.context.user == Profit.objects.get(id=profit_id).model.user): raise Exception("UserDoesNotHaveThisProfit")
-        model = Profit.objects.get(id=profit_id)
+        model = Profit.objects.get(id=profit_id).model
 
         Profit.objects.get(id=profit_id).delete()
+        update_model_dates(model)
 
         return DeleteProfitMutation(Profit.objects.filter(model=model))
 

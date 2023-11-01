@@ -67,6 +67,9 @@ def update_expense_dates(expense):
             date_expense.save()
 
 def update_model_dates(model):
+    """
+    Осуществляет пересчет сумм на каждую дату модели
+    """
     model_dates = Date.objects.filter(model = model)
 
     for i in range(len(model_dates)):
